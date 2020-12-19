@@ -7,6 +7,7 @@ import os
 import subprocess
 import glob
 
+# save screenshot with Ctrl+S
 
 def launchFlameshot():
     flameshot = "flameshot gui -p " + myDir
