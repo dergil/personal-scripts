@@ -2,34 +2,37 @@
 
 import time
 import pathlib
-from os import walk
 import os
 import subprocess
 import glob
+
+
+# takes screenshot with flameshot
+# resizes screenshot, puts it on clipboard
+# dedicated directory needed
 
 # save screenshot with Ctrl+S
 
 def launchFlameshot():
     flameshot = "flameshot gui -p " + myDir
-    # https://stackoverflow.com/questions/21936597/blocking-and-non-blocking-subprocess-calls
-    process = subprocess.Popen(flameshot, shell=True)
-    time.sleep(3)
-    process.terminate()
-    process.wait()
+    subprocess.Popen(flameshot, shell=True)
+    while isDirEmpty(myDir):
+        time.sleep(0.1)
+
+
+def isDirEmpty(path):
+    return len(os.listdir(path)) == 0
 
 
 def resize():
-    # compiling list of files in dir
     global files
-    for (dirpath, dirnames, filenames) in walk(myDir):
-        files.extend(filenames)
-        break
+    files = os.listdir(myDir)
 
     # alternative, simpler resizing:
-    # resizeCommand = "mogrify -resize 70% " + mypath + files[0]
+    # resizeCommand = "mogrify -resize 70% " + myDir + files[0]
 
     # picture gets downsized, the -density and -quality settings cause the 140%
-    resizeCommand = "convert " + myDir + files[0] + " -density 100 -quality 100 -resize 140% " + myDir + files[0]
+    resizeCommand = "convert " + myDir + files[0] + " -density 100 -quality 100 -resize 120% " + myDir + files[0]
     subprocess.call(resizeCommand, shell=True)
 
 
@@ -52,6 +55,7 @@ def removePNG():
 home = str(pathlib.Path.home())
 myDir = home + "/Pictures/clipboard/"
 files = []
+removePNG()
 launchFlameshot()
 resize()
 saveToClip()
